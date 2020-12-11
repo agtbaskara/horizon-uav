@@ -137,4 +137,5 @@ dmypy.json
 /raw_dataset
 /dataset_original
 /model
+/prediction
 dataset_export.json
