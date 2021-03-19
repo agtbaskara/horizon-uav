@@ -130,10 +130,12 @@ dmypy.json
 
 # Visual Studio Code
 /.vscode
+/.devcontainer
 
 # Dataset
 /dataset
 /raw_dataset
 /dataset_original
 /model
+/prediction
 dataset_export.json
