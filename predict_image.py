@@ -1,10 +1,9 @@
 import tensorflow as tf
-import tensorflow_addons as tfa
 import cv2
 import numpy as np
 import os
 import math
-import time
+import matplotlib.pyplot as plt
 
 # Enable GPU Memory Growth
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -40,6 +39,16 @@ def get_horizon_line(border):
 
     X = np.vstack([x, np.ones(len(x))]).T
     m, c = np.linalg.lstsq(X, y, rcond=None)[0]
+
+    plt.figure(figsize=(5, 5))
+    plt.scatter(x, y, label='Border Data')
+    x = np.linspace(0, 224, 1000)
+    y = m*x+c
+    #plt.plot(x, y, '-r', label='Regression Line (y=m*x+c)')
+    plt.legend(loc='upper left')
+    plt.xlim(0, 224)
+    plt.ylim(224, 0)
+    plt.show()
     
     return m, c
 
@@ -86,71 +95,59 @@ def dice_loss(y_true, y_pred, num_classes=2):
 
 # Parameter
 image_size = (224, 224)
-model_path = os.path.join("model/model-unet.h5")
-video_path = os.path.join("raw_dataset", "videos", "a3-converted.mp4-00.08.04.849-00.09.06.443.mp4")
+model_path = os.path.join("model", "model-unet.h5")
+image_path = os.path.join("original.png")
 
 # Load model
 model = tf.keras.models.load_model(model_path, custom_objects={'dice_loss': dice_loss, 'MaxMeanIoU': MaxMeanIoU})
 
 # Load Video
-cap = cv2.VideoCapture(video_path)
-while(cap.isOpened()):
-    ret, frame = cap.read()
-    if ret:
-        image_height = frame.shape[0]
-        image_width = frame.shape[1]
-        frame = frame[0:image_height, (image_width-image_height)//2:(image_width-image_height)//2+image_height]
-        frame_ori = frame.copy()
-        frame = cv2.resize(frame, image_size)
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame = cv2.normalize(frame, None, 0, 1, cv2.NORM_MINMAX, cv2.CV_32F)
+frame = cv2.imread(image_path)
+image_height = frame.shape[0]
+image_width = frame.shape[1]
+frame = frame[0:image_height, (image_width-image_height)//2:(image_width-image_height)//2+image_height]
+frame_ori = frame.copy()
+frame = cv2.resize(frame, image_size)
+frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+frame = cv2.normalize(frame, None, 0, 1, cv2.NORM_MINMAX, cv2.CV_32F)
 
-        # Predict mask
-        pred = model.predict(np.expand_dims(frame, 0))
+# Predict mask
+pred = model.predict(np.expand_dims(frame, 0))
 
-        # Process mask
-        mask = pred.squeeze()
-        mask = np.stack((mask,)*3, axis=-1)
-        mask[mask >= 0.5] = 1
-        mask[mask < 0.5] = 0
+# Process mask
+mask = pred.squeeze()
+mask = np.stack((mask,)*3, axis=-1)
+mask[mask >= 0.5] = 1
+mask[mask < 0.5] = 0
 
-        mask_land = mask[:, :, 0]
-        mask_sky = mask[:, :, 1]
-        
-        # Post Process
-        mask_land = cv2.cvtColor(mask_land, cv2.COLOR_BGR2GRAY)
-        mask_sky = cv2.cvtColor(mask_sky, cv2.COLOR_BGR2GRAY)
+mask_land = mask[:, :, 0]
+mask_sky = mask[:, :, 1]
 
-        border = get_border(mask_land, mask_sky)
-        m, c = get_horizon_line(border)
+# Post Process
+mask_land = cv2.cvtColor(mask_land, cv2.COLOR_BGR2GRAY)
+mask_sky = cv2.cvtColor(mask_sky, cv2.COLOR_BGR2GRAY)
 
-        resized_image_height = frame.shape[0]
-        resized_image_width = frame.shape[1]
-        roll, pitch = get_roll_pitch(m, c, resized_image_height, resized_image_width)
-        
-        #frame_ori = cv2.resize(frame_ori, (480, 480))
-        scale = image_height/image_size[0]
-        cv2.imshow("Original", frame_ori)
+border = get_border(mask_land, mask_sky)
+m, c = get_horizon_line(border)
 
-        frame_ori = draw_horizon_line(frame_ori, m, c, scale)
+resized_image_height = frame.shape[0]
+resized_image_width = frame.shape[1]
+roll, pitch = get_roll_pitch(m, c, resized_image_height, resized_image_width)
 
-        text_roll = "roll:" + str(round(roll, 2)) + " degree"
-        text_pitch = "pitch:" + str(round(pitch, 2)) + " %"
+#frame_ori = cv2.resize(frame_ori, (480, 480))
+scale = image_height/image_size[0]
+cv2.imshow("Original", frame_ori)
 
-        cv2.putText(frame_ori, text_roll, (5, 15), 0, 0.5, (125, 0, 255), 2)
-        cv2.putText(frame_ori, text_pitch, (5, 35), 0, 0.5, (125, 0, 255), 2)
+frame_ori = draw_horizon_line(frame_ori, m, c, scale)
 
-        cv2.imshow("Horizon", frame_ori)
-        cv2.imshow("Land", mask_land)
-        cv2.imshow("Border", border)
-        
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+text_roll = "roll:" + str(round(roll, 2)) + " degree"
+text_pitch = "pitch:" + str(round(pitch, 2)) + " %"
 
-    else:
-        break
+cv2.putText(frame_ori, text_roll, (5, 15), 0, 0.5, (125, 0, 255), 2)
+cv2.putText(frame_ori, text_pitch, (5, 35), 0, 0.5, (125, 0, 255), 2)
 
-print("Video Ended")
-cap.release()
+cv2.imshow("Horizon", frame_ori)
+cv2.imshow("Land", mask_land)
+cv2.imshow("Border", border)
 
-cv2.destroyAllWindows()
+cv2.waitKey(0)

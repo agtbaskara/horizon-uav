@@ -76,6 +76,7 @@ output_details = interpreter.get_output_details()
 # Load Video
 cap = cv2.VideoCapture(video_path)
 while(cap.isOpened()):
+    start_time = time.time()
     ret, frame = cap.read()
     if ret:
         image_height = frame.shape[0]
@@ -114,11 +115,15 @@ while(cap.isOpened()):
         scale = image_height/image_size[0]
         frame_ori = draw_horizon_line(frame_ori, m, c, scale)
 
+        fps = 1.0/(start_time-time.time())
+
         text_roll = "roll:" + str(round(roll, 2)) + " degree"
         text_pitch = "pitch:" + str(round(pitch, 2)) + " %"
+        text_fps = "fps:" + str(round(fps, 2))
 
         cv2.putText(frame_ori, text_roll, (5, 15), 0, 0.5, (125, 0, 255), 2)
         cv2.putText(frame_ori, text_pitch, (5, 35), 0, 0.5, (125, 0, 255), 2)
+        cv2.putText(frame_ori, text_fps, (5, 55), 0, 0.5, (125, 0, 255), 2)
 
         cv2.imshow("Horizon", frame_ori)
         cv2.imshow("Land", mask_land)
