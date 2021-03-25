@@ -107,10 +107,7 @@ There are 4 stages in the horizon detection system:
 - M. Sandler, A. Howard, M. Zhu, A. Zhmoginov, and L.-C. Chen, “MobileNetV2: Inverted Residuals and Linear Bottlenecks,” arXiv:1801.04381 [cs], Mar. 2019. Available: http://arxiv.org/abs/1801.04381.
 - P. K. Gadosey et al., “SD-UNet: Stripping down U-Net for Segmentation of Biomedical Images on Platforms with Low Computational Budgets,” Diagnostics, vol. 10, no. 2, p. 110, Feb. 2020, doi: 10.3390/diagnostics10020110.
 - Tensorflow Documentation, https://www.tensorflow.org/api_docs/
+- OpenCV Documentation, https://docs.opencv.org/master/
 - Numpy Linear Algorithm Documentation, https://numpy.org/doc/stable/reference/generated/numpy.linalg.lstsq.html
 - Google Coral Documentation, https://coral.ai/docs/
-
-
-
-
-
+- Nvidia TensorRT Documentation, https://docs.nvidia.com/deeplearning/tensorrt/developer-guide/index.html
