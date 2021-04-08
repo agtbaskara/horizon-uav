@@ -34,6 +34,7 @@ Notes: Change `export_json_path` to the appropriate json file exported from Labe
 - Use `train_*.py` to train your desired architecture (`unet`, `sd-unet`, or `mobilenet-unet`)
 - Change `dataset_path` to the appropriate path if needed
 - You can modify the Hyperparameter and Augmentation if needed
+- Refer `train_google_colab.ipynb` to train model using google colab
 
 ### Quantization:
 - Use `convert_to_tflite.py` to convert your Tensorflow model to TFLite model
