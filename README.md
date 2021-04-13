@@ -25,7 +25,7 @@ Detect horizon using front-faced mounted camera on UAV using deep learning based
 ### Dataset:
 - Use `download_dataset_original.py` to download dataset in original ratio
 - Use `download_dataset_square.py` to download dataset in square ratio
-- You can also download the dataset and sample video manually from here: https://www.dropbox.com/sh/43bdvabyefn6im2/AAA_sbfhVaAd6nn2hT2wcj_Wa?dl=0
+- You can also download the dataset and sample video manually from here: https://1drv.ms/f/s!ArMhy7w0Pabls18kV9D7GVtonJmq
 - Store dataset at `dataset/images`
 
 Notes: Change `export_json_path` to the appropriate json file exported from LabelBox
@@ -45,7 +45,7 @@ Notes: Change `export_json_path` to the appropriate json file exported from Labe
 Notes: Not all architecture support quantization
 
 ### Inference:
-- Train a model or download pre-trained model from here: https://www.dropbox.com/sh/43bdvabyefn6im2/AAA_sbfhVaAd6nn2hT2wcj_Wa?dl=0
+- Train a model or download pre-trained model from here: https://1drv.ms/f/s!ArMhy7w0Pabls18kV9D7GVtonJmq
 - Use `predict_image.py` to do inference on single image
 - Use `predict_camera_*.py` to do inference using camera as input
 - Use `predict_video_*.py` to do inference using video as input
