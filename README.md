@@ -68,40 +68,43 @@ Notes: `edgetpu` model require Google Coral, `tflite` model require Tensorflow-l
 - Just play with it! Add LSTM or something interesting (Don't forget it must run in real-time!)
 
 ## How it works:
-The horizon detection system in the UAV aims to detect the horizon line to obtain UAV orientation data relative to the earth's horizon using AI and computer vision. This orientation data is expected to back up IMU sensors and help control systems in the UAV. This horizon detection system is run on a Single Board Computer connected to the Flight Controller. The Single Board Computer is also equipped with a camera and AI Accelerator, as shown below:
+The horizon detection system in the UAV aims to detect the horizon line to obtain UAV orientation data relative to the ground's horizon using AI and computer vision. This orientation data is expected to back up IMU sensors and help control systems in the UAV. This horizon detection system is run on a Single Board Computer connected to the Flight Controller. The Single Board Computer is also equipped with a camera and AI Accelerator, as shown below:
 <p align="center">
     <img src="https://user-images.githubusercontent.com/15165276/111776145-3cdd7700-88e4-11eb-9b0a-9d2ad56a92ff.png" width="50%"></img>
 </p>
 There are 4 stages in the horizon detection system:
 
 1. Semantic Segmentation
+
     <p align="center">
         <img src="https://user-images.githubusercontent.com/15165276/111776211-4e268380-88e4-11eb-877a-d18f79ce9ae7.png" width="50%"></img> 
     </p>
-    In the first stage, semantic segmentation is carried out on the input image taken from the camera facing the front of the UAV. Semantic segmentation aims to detect the position of heaven and earth in the image. This process is carried out using a previously trained U-Net-based deep learning algorithm
-    using a labeled dataset. The output of this stage is a binary image showing the position of the heavens and the earth.
+    In the first stage, semantic segmentation is carried out on the input image taken from the camera facing the front of the UAV. Semantic segmentation aims to detect the position of the sky and ground in the image. This process uses a previously trained U-Net-based deep learning algorithm using a labeled dataset. The output of this stage is a binary image showing the position of the sky and the ground.
 
 2. Border Extraction
+
     <p align="center">
         <img src="https://user-images.githubusercontent.com/15165276/111776162-41a22b00-88e4-11eb-8783-a4d58dd19656.png" width="50%"></img>
     </p>
-    In the second stage, the boundary line's extraction between heaven and earth is carried out using bitwise operations on the image. At this stage, morphology operations are also carried out on the image to reduce noise in the image obtained in the semantic segmentation process. The output from this stage is data from the horizon line that separates the sky and earth.
+    In the second stage, the boundary line's extraction between sky and ground is carried out using bitwise operations on the image. At this stage, morphology operations are also carried out on the image to reduce noise obtained in the semantic segmentation process. The output from this stage is data from the horizon line that separates the sky and ground.
 
 3. Linear Regression
+
     <p align="center">
         <img src="https://user-images.githubusercontent.com/15165276/111776139-39e28680-88e4-11eb-92ab-6d72ba992b93.png" width="50%"></img>
     </p>
     In the third stage, linear regression is carried out on the horizon line data to obtain the line equation in the form 𝑦 = 𝑚 ∗ 𝑥 + 𝑐
 
 4. Roll and Pitch calculation
-    In the last stage, the previously obtained horizon line equation is converted into roll and pitch angles using these formula:
+
+    In the last stage, the previously obtained horizon line equation is converted into roll and pitch angles using this formula:
     <p align="center">
         <img src="https://user-images.githubusercontent.com/15165276/111776201-4bc42980-88e4-11eb-91db-98502bd441ff.png" width="50%"></img>
     </p>
     <p align="center">
         <img src="https://user-images.githubusercontent.com/15165276/111783285-a3669300-88ec-11eb-888f-d5c705ad3709.jpg" width="50%"></img>
     </p>
-    The obtained pitch and roll values ​​will then be sent to the flight controller for use to control the vehicle's stability.
+    The obtained pitch and roll values ​​will then be sent to the flight controller to control the vehicle's stability.
 
 ## Reference:
 - O. Ronneberger, P. Fischer, and T. Brox, “U-Net: Convolutional Networks for Biomedical Image Segmentation,” arXiv:1505.04597 [cs], May 2015. Available: http://arxiv.org/abs/1505.04597.
